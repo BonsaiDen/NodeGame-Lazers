@@ -1,0 +1,18 @@
+{
+  "name": "unit",
+  "version": "0.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "~3.4.4",
+    "lithium": "~0.1.0",
+    "browserify-middleware": "~1.19.0",
+    "bison": "~1.1.1",
+    "bisonjs": "~2.0.0"
+  }
+}
