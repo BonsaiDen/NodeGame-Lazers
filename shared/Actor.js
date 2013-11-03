@@ -9,6 +9,7 @@ var Actor = Class(function(x, y, r, speed, angular, radius) {
     this.id = ++Actor.uID;
     this.tick = 0;
     this.states = [];
+    this.inputState = 0;
 
     // Position / Angle
     this.position = new Position(x, y, r);
@@ -19,7 +20,6 @@ var Actor = Class(function(x, y, r, speed, angular, radius) {
     // Cached Remote Position
     this.remote = new Position(x, y, r);
 
-    // TODO convert into seconds
     // Speed limit (in units per second)
     this.speed = speed;
 
@@ -36,6 +36,7 @@ var Actor = Class(function(x, y, r, speed, angular, radius) {
     $StateBufferSize: 30, // Higher RT needs higher BufferSize
     $StateDelay: 2,
     $ErrorRange: 5,
+
 
     // Methods ----------------------------------------------------------------
     input: function(inputState, u) {
@@ -61,6 +62,15 @@ var Actor = Class(function(x, y, r, speed, angular, radius) {
 
         this.velocity.set(vx, vy, inputState[4]);
 
+        this.inputState = (
+            (+inputState[0]) |
+            (+inputState[1] << 1) |
+            (+inputState[2] << 2) |
+            (+inputState[3] << 3) |
+            (+inputState[5] << 4) |
+            (+inputState[6] << 5)
+        );
+
     },
 
     receive: function(state, correctPosition) {
@@ -69,6 +79,7 @@ var Actor = Class(function(x, y, r, speed, angular, radius) {
 
         if (correctPosition) {
 
+            // See how much the local states diverge from the remote position
             var minDistance = 1000000000000,
                 index = -1;
 
@@ -86,8 +97,10 @@ var Actor = Class(function(x, y, r, speed, angular, radius) {
 
             }
 
+            // Any distance?
             if (minDistance > 0) {
 
+                // Calculate the tick difference
                 var tickDiff = this.tick - state[1];
                 if (tickDiff < 0) {
                     tickDiff += Actor.StateBufferSize;
@@ -95,6 +108,9 @@ var Actor = Class(function(x, y, r, speed, angular, radius) {
 
                 tickDiff = Math.max(tickDiff, 1);
 
+                // If the distance it outside the error range
+                // we ran into heavy lag or local cheating
+                // in either case, reset the position to the server state
                 if (minDistance > Actor.ErrorRange * tickDiff) {
                     this.position.x = state[3];
                     this.position.y = state[4];
@@ -158,31 +174,36 @@ var Actor = Class(function(x, y, r, speed, angular, radius) {
         }
     },
 
-    serialize: function(remote, initial) {
+    serialize: function(remote, full) {
 
-        if (initial) {
+        // Full state
+        if (full) {
             return [
                 this.id,
                 this.tick,
                 Math.round(this.position.r),
                 Math.round(this.position.x),
                 Math.round(this.position.y),
+                this.inputState,
                 this.speed,
                 this.angular,
                 this.radius
             ];
 
+        // Delayed state when sending from server to client
         } else if (remote) {
             var state = this.states[this.states.length - 1 - Actor.StateDelay];
             return state ? state : this.serialize(false, false);
 
+        // Update state
         } else {
             return [
                 this.id,
                 this.tick,
                 Math.round(this.position.r),
                 Math.round(this.position.x),
-                Math.round(this.position.y)
+                Math.round(this.position.y),
+                this.inputState
             ];
         }
 
@@ -193,11 +214,13 @@ var Actor = Class(function(x, y, r, speed, angular, radius) {
         this.id = state[0];
         this.position.set(state[3], state[4], state[2]);
         this.remote.set(state[3], state[4], state[2]);
+        this.inputState = state[5];
 
-        if (state.length > 5) {
-            this.speed = state[5];
-            this.angular = state[6];
-            this.radius = state[7];
+        // Full state only
+        if (state.length > 6) {
+            this.speed = state[6];
+            this.angular = state[7];
+            this.radius = state[8];
         }
 
     }

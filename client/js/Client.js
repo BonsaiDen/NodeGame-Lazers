@@ -6,7 +6,7 @@ var Game = require('./Game').Game,
     HashList = require('../../shared/HashList').HashList,
     Network = require('../../shared/Network').Network,
     Loop = require('../../shared/Loop').Loop,
-    Map = require('../../shared/Map').Map,
+    Map = require('./graphics/Map').Map,
     Player = require('./graphics').Player;
 
 

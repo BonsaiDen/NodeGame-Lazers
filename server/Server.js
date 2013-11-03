@@ -16,7 +16,19 @@ var Server = Class(function() {
     this.remotes = new HashList();
     this.players = new HashList();
 
-    this.map = new Map(640, 480);
+    this.map = new Map(640, 480, [
+        [
+            320, 240,
+            [100, -100, 100, 100, -100, 100, -100, -100]
+        ],
+
+        [
+            0, 0,
+            [0, 0, 100, 0, 0, 100]
+        ]
+
+    ]);
+
     this.config = {
         fps: 30
     };

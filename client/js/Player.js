@@ -55,7 +55,9 @@ var Player = Class(function(client, state, isLocal) {
             input.isDown(Input.Key.D),
             input.isDown(Input.Key.W),
             input.isDown(Input.Key.S),
-            tr
+            tr,
+            input.isDown(Input.Key.MOUSE_LEFT),
+            input.isDown(Input.Key.MOUSE_RIGHT)
         ];
 
         this.actor.input(inputState, u);

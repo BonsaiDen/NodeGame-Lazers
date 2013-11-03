@@ -127,8 +127,9 @@
                 that.__mouse.x = (e.clientX - rect.left);
                 that.__mouse.y = (e.clientY - rect.top);
 
-                if (!that.__state[e.button + 255]) {
-                    that.__downs.push(e.button + 255);
+                var id = e.button || e.which - 1;
+                if (!that.__state[id + 255]) {
+                    that.__downs.push(id + 255);
                 }
 
             }, false);
@@ -139,8 +140,9 @@
                 that.__mouse.x = (e.clientX - rect.left);
                 that.__mouse.y = (e.clientY - rect.top);
 
-                if (that.__state[e.button + 255]) {
-                    that.__ups.push(e.button + 255);
+                var id = e.button || e.which - 1;
+                if (that.__state[id + 255]) {
+                    that.__ups.push(id + 255);
                 }
 
             }, false);
@@ -364,7 +366,8 @@
         MODECHANGE: 31,
         SLEEP: 95,
 
-        MOUSE_LEFT: 256,
+        MOUSE_LEFT: 255,
+        MOUSE_MIDDLE: 256,
         MOUSE_RIGHT: 257
 
     };

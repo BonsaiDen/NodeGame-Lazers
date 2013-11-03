@@ -8,12 +8,7 @@ var Map = Class(function(width, height, data) {
 
     this.width = width;
     this.height = height;
-
-    data = data || [
-        [0, 0, [0, 0, 100, 0, 100, 400, 0, 400]]
-    ];
-
-    this.parse(data);
+    this.parse(data || []);
 
 }, {
 
@@ -53,8 +48,10 @@ var Map = Class(function(width, height, data) {
 
     collide: function(player) {
 
-        // TODO define size on actor
-        var position = player.actor.position;
+        var actor = player.actor,
+            radius = actor.radius,
+            position = actor.position;
+
         if (position.x < 0) {
             position.x = 0;
 
@@ -69,6 +66,19 @@ var Map = Class(function(width, height, data) {
             position.y = this.height;
         }
 
+        var circle = new SAT.Circle(new SAT.Vector(position.x, position.y), radius),
+            response = new SAT.Response();
+
+        this.structures.forEach(function(struct) {
+
+            var collided = SAT.testPolygonCircle(struct.polygon, circle, response);
+            if (collided) {
+                actor.position.x += response.overlapV.x;
+                actor.position.y += response.overlapV.y;
+            }
+
+        });
+
     },
 
     serialize: function() {
@@ -76,6 +86,7 @@ var Map = Class(function(width, height, data) {
     },
 
     restore: function(state) {
+        console.log(state);
         this.width = state[0];
         this.height = state[1];
         this.parse(state[2]);

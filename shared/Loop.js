@@ -21,8 +21,6 @@ var Loop = Class(function(fps, update, render, scope) {
     this.renderCallback = render;
     this.scope = scope || null;
 
-    console.log(this.fps, this.tps);
-
 }, {
 
     // Statics ----------------------------------------------------------------

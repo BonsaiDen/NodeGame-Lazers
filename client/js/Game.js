@@ -14,11 +14,19 @@ var Game = Class(function(client, element, map) {
 
     // TODO implement scrolling and limits via map.collide()
     this.container = document.getElementById(element);
+
+    // TODO set viewport size
 	this.renderer = PIXI.autoDetectRenderer(this.map.width, this.map.height, null, false, true);
 	this.renderer.view.tabindex = '1';
 	this.renderer.view.style.display = 'block';
+	this.renderer.view.onselectstart = function(e) {
+        e.preventDefault();
+        return false;
+    };
 	this.container.appendChild(this.renderer.view);
     this.input.bind(this.renderer.view);
+
+    this.map.addToStage(this.stage);
 
 }, {
 
@@ -32,6 +40,7 @@ var Game = Class(function(client, element, map) {
     },
 
     destroy: function() {
+        this.map.removeFromStage(this.stage);
         this.container.removeChild(this.renderer.view);
         this.input.unbind();
         this.input = null;
